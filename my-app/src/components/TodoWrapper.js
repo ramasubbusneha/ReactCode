@@ -1,48 +1,75 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Todo } from "./Todo";
-import { TodoForm } from "./TodoForms";
+import { TodoForm } from "./TodoForms"; // Corrected import
 import { v4 as uuidv4 } from "uuid";
 import { EditTodoForm } from "./EditTodoForm";
 
 export const TodoWrapper = () => {
     const [todos, setTodos] = useState([]);
     const [editingId, setEditingId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const addTodo = (todo) => {
-        setTodos([
+    useEffect(() => {
+        const savedTodos = JSON.parse(localStorage.getItem('todos')) || [];
+        setTodos(savedTodos);
+    }, []);
+
+    const addTodo = (todo, priority) => {
+        const newTodos = [
             ...todos,
-            { id: uuidv4(), task: todo, completed: false, isEditing: false },
-        ]);
+            { id: uuidv4(), task: todo, completed: false, isEditing: false, priority }
+        ];
+        setTodos(newTodos);
+        localStorage.setItem('todos', JSON.stringify(newTodos));
     };
 
-    const deleteTodo = (id) => setTodos(todos.filter((todo) => todo.id !== id));
+    const deleteTodo = (id) => {
+        const newTodos = todos.filter((todo) => todo.id !== id);
+        setTodos(newTodos);
+        localStorage.setItem('todos', JSON.stringify(newTodos));
+    };
 
     const toggleComplete = (id) => {
-        setTodos(
-            todos.map((todo) =>
-                todo.id === id ? { ...todo, completed: !todo.completed } : todo
-            )
+        const newTodos = todos.map((todo) =>
+            todo.id === id ? { ...todo, completed: !todo.completed } : todo
         );
+        setTodos(newTodos);
+        localStorage.setItem('todos', JSON.stringify(newTodos));
     };
 
     const startEditing = (id) => {
         setEditingId(id);
     };
 
-    const editTask = (task, id) => {
-        setTodos(
-            todos.map((todo) =>
-                todo.id === id ? { ...todo, task, isEditing: false } : todo
-            )
+    const editTask = (task, priority, id) => {
+        const newTodos = todos.map((todo) =>
+            todo.id === id ? { ...todo, task, priority, isEditing: false } : todo
         );
+        setTodos(newTodos);
+        localStorage.setItem('todos', JSON.stringify(newTodos));
         setEditingId(null);
     };
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value.toLowerCase());
+    };
+
+    const filteredTodos = todos.filter(todo =>
+        todo.task.toLowerCase().includes(searchTerm)
+    );
 
     return (
         <div className="TodoWrapper">
             <h1>Get Things Done!</h1>
+            <input
+                type="text"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="search-input"
+                placeholder="Search tasks..."
+            />
             <TodoForm addTodo={addTodo} />
-            {todos.map((todo) =>
+            {filteredTodos.map((todo) =>
                 todo.id === editingId ? (
                     <EditTodoForm key={todo.id} editTodo={editTask} task={todo} />
                 ) : (
