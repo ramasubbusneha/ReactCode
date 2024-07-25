@@ -89,4 +89,15 @@ h1 {
 .delete-icon {
   cursor: pointer;
 }
- 
+
+/* Theme Toggle Button */
+.theme-toggle {
+  margin: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #8758ff; /* Button color */
+  color: #fff; /* Button text color */
+  font-size: 16px;
+}

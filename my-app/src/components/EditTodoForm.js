@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 
 export const EditTodoForm = ({ editTodo, task }) => {
     const [value, setValue] = useState(task.task);
+    const [priority, setPriority] = useState(task.priority);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        editTodo(value, task.id);
+        editTodo(value, priority, task.id);
     };
 
     return (
@@ -17,9 +18,16 @@ export const EditTodoForm = ({ editTodo, task }) => {
                 className="todo-input"
                 placeholder='Update task'
             />
-            <button type="submit" className='todo-btn'>
-                Update Task
-            </button>
+            <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className="priority-select"
+            >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            <button type="submit" className='todo-btn'>Update Task</button>
         </form>
     );
 };
